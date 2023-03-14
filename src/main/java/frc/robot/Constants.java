@@ -116,6 +116,18 @@ public final class Constants {
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
+  public static final class ArmConstants {
+    static final int ARM_CURRENT_LIMIT_A = 20;
+    static final double ARM_OUTPUT_POWER = 0.55;
+  }
+
+  public static final class IntakeConstants {
+    static final int INTAKE_CURRENT_LIMIT_A = 25;
+    static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+    static final double INTAKE_OUTPUT_POWER = 1.0;
+    static final double INTAKE_HOLD_POWER = 0.07;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kManipControllerPort = 1;
