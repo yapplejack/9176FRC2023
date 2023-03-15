@@ -14,6 +14,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Constants.ModuleConstants;
 
@@ -108,6 +109,14 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
+  }
+
+  @Override
+  public void periodic() {
+      SmartDashboard.putNumber("Drive velocity: " + steerMotor.getDeviceId(), getState().speedMetersPerSecond);
+      SmartDashboard.putNumber("Relative position: " + steerMotor.getDeviceId(), getRelativePosition().getDegrees());
+      SmartDashboard.putNumber("Absolute position: " + steerMotor.getDeviceId(), getAbsPosition().getDegrees());
+      SmartDashboard.putNumber("Drive position: " + steerMotor.getDeviceId(), getDriveDistance());
   }
 
   /**

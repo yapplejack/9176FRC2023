@@ -2,10 +2,34 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import frc.robot.Constants;
 
-public class ArmSubsystem {
-    //private final CANSparkMax intakeLowerMotor = new CANSparkMax(RobotMap.INTAKE_LOWER_MOTOR);
-    //private final CANSparkMax intakeUpperMotor = new CANSparkMax(RobotMap.INTAKE_UPPER_MOTOR);
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
+import com.revrobotics.CANSparkMax.IdleMode;
+import frc.robot.Constants.ArmConstants;
+
+public class ArmSubsystem extends SubsystemBase {
+    private final CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public ArmSubsystem() {
+    
+    }
+
+    public void raiseArm(double trigger) {
+        arm.set(ArmConstants.ARM_OUTPUT_POWER * trigger);
+    }
+
+    public void lowerArm(double trigger) {
+        arm.set(-ArmConstants.ARM_OUTPUT_POWER * trigger);
+    }
+    
 }

@@ -140,6 +140,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
+
+
   public void setArmMotor(double percent) {
     arm.set(percent);
   }
@@ -171,13 +173,13 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double armPower;
-    if (m_manipController.getRawButton(1)) {
+    double armPower; // 1 and 4 for buttons
+    if (m_manipController.getLeftTriggerAxis() > .1) {
       // lower the arm
-      armPower = -ARM_OUTPUT_POWER;
-    } else if (m_manipController.getRawButton(4)) {
+      armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
+    } else if (m_manipController.getRightTriggerAxis() > .1) {
       // raise the arm
-      armPower = ARM_OUTPUT_POWER;
+      armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
     } else {
       // do nothing and let it sit where it is
       armPower = 0.0;
