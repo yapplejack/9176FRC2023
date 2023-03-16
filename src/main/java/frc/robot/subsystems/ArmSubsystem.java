@@ -12,16 +12,10 @@ import frc.robot.Constants.ArmConstants;
 public class ArmSubsystem extends SubsystemBase {
     private final CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
     
-    
-    
-    
-    
-    
-    
-    
-    
     public ArmSubsystem() {
-    
+        arm.setInverted(true);
+        arm.setIdleMode(IdleMode.kBrake);
+        arm.setSmartCurrentLimit(ArmConstants.ARM_CURRENT_LIMIT_A);
     }
 
     public void raiseArm(double trigger) {

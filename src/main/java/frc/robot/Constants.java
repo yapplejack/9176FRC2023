@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -46,10 +48,10 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
-    public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = Math.PI;
-    public static final double kBackRightChassisAngularOffset = Math.PI / 2;
+    public static final Rotation2d kRearRightTurningEncoderOffset = Rotation2d.fromDegrees(-64.2679);
+    public static final Rotation2d kFrontRightTurningEncoderOffset = Rotation2d.fromDegrees(44.23);
+    public static final Rotation2d kFrontLeftTurningEncoderOffset = Rotation2d.fromDegrees(15.19);
+    public static final Rotation2d kRearLeftTurningEncoderOffset = Rotation2d.fromDegrees(99.36);
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 3;
@@ -62,9 +64,16 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 6;
     public static final int kRearRightTurningCanId = 8;
 
+    public static final int kFrontLeftTurningEncoderPort = 1;
+    public static final int kRearLeftTurningEncoderPort = 0;
+    public static final int kFrontRightTurningEncoderPort = 2;
+    public static final int kRearRightTurningEncoderPort = 3;
+
     public static final boolean kGyroReversed = false;
 
     public static final boolean kFieldRelative = true;
+
+
   }
 
   public static final class ModuleConstants {
@@ -116,6 +125,10 @@ public final class Constants {
 
     public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
+    public static final int kNominalVoltage = 12;
+    public static final double kDriveGearRatio = 5.5;
+    public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
+    public static final double kTurnPositionConversionFactor = 46.42;
   }
 
   public static final class ArmConstants {
