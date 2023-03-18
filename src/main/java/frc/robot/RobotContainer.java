@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final SwerveSubsystem m_robotDrive = new SwerveSubsystem();
+  public final SwerveSubsystem m_robotDrive = new SwerveSubsystem();
 
   //private final ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
 
