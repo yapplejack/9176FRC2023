@@ -7,11 +7,15 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMax.IdleMode;
+//import com.revrobotics.CANSparkMax;
+//import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+//import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.wpilibj.XboxController;
+//import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.auto.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 
 /**
@@ -24,10 +28,11 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
-  CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
-  CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
-
+  
+  //CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
+  ArmSubsystem arm;
+  //CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
+  IntakeSubsystem intake;
 
   static final int ARM_CURRENT_LIMIT_A = 20;
 
@@ -78,7 +83,6 @@ public class Robot extends TimedRobot {
 
   XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
 
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -88,11 +92,13 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    arm.setInverted(true);
-    arm.setIdleMode(IdleMode.kBrake);
-    arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
-    intake.setInverted(false);
-    intake.setIdleMode(IdleMode.kBrake);
+    arm = new ArmSubsystem();
+    intake = new IntakeSubsystem();
+    //arm.setInverted(true);
+    //arm.setIdleMode(IdleMode.kBrake);
+    //arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+    //intake.setInverted(false);
+    //intake.setIdleMode(IdleMode.kBrake);
 
   }
 
@@ -122,7 +128,9 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = new TestConeAuto(arm, intake);
+    //m_autonomousCommand = new TestCubeAuto(arm, intake);
+    //m_autonomousCommand = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake);
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -143,15 +151,8 @@ public class Robot extends TimedRobot {
 
 
   public void setArmMotor(double percent) {
-    arm.set(percent);
+    //arm.set(percent);
   }
-
-  public void setIntakeMotor(double percent, int amps) {
-    intake.set(percent);
-    intake.setSmartCurrentLimit(amps);
-  }
-
-
 
   @Override
   public void teleopInit() {
@@ -173,43 +174,50 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double armPower; // 1 and 4 for buttons
+    //double armPower; // 1 and 4 for buttons
     if (m_manipController.getLeftTriggerAxis() > .1) {
       // lower the arm
-      armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
+     // armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
+     arm.lowerArm();
     } else if (m_manipController.getRightTriggerAxis() > .1) {
       // raise the arm
-      armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
+      //armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
+      arm.raiseArm();
     } else {
       // do nothing and let it sit where it is
-      armPower = 0.0;
+      //armPower = 0.0;
+      arm.noArmPower();
     }
-    setArmMotor(armPower);
+    //setArmMotor(armPower);
   
     double intakePower;
     int intakeAmps;
     if (m_manipController.getRawButton(5)) {
       // cube in or cone out
       intakePower = INTAKE_OUTPUT_POWER;
+      //intake.dropCone();
       intakeAmps = INTAKE_CURRENT_LIMIT_A;
       lastGamePiece = CUBE;
     } else if (m_manipController.getRawButton(6)) {
       // cone in or cube out
       intakePower = -INTAKE_OUTPUT_POWER;
+      //intake.pickupCone();
       intakeAmps = INTAKE_CURRENT_LIMIT_A;
       lastGamePiece = CONE;
     } else if (lastGamePiece == CUBE) {
+      //intake.holdCube();
       intakePower = INTAKE_HOLD_POWER;
       intakeAmps = INTAKE_HOLD_CURRENT_LIMIT_A;
     } else if (lastGamePiece == CONE) {
+      //intake.holdCone();
       intakePower = -INTAKE_HOLD_POWER;
       intakeAmps = INTAKE_HOLD_CURRENT_LIMIT_A;
     } else {
       intakePower = 0.0;
+
       intakeAmps = 0;
     }
-    setIntakeMotor(intakePower, intakeAmps);
-
+    intake.setIntakeMotor(intakePower, intakeAmps);
   }
 
   @Override

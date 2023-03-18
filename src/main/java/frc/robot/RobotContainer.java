@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+//import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -35,8 +37,12 @@ public class RobotContainer {
   // The robot's subsystems
   private final SwerveSubsystem m_robotDrive = new SwerveSubsystem();
 
+  //private final ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
+
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+
+  XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -51,9 +57,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(-m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
   }
@@ -72,6 +78,7 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+    new JoystickButton(m_driverController, 1).onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
   }
 
   /**

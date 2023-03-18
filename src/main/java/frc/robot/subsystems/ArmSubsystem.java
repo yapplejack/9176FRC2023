@@ -18,12 +18,17 @@ public class ArmSubsystem extends SubsystemBase {
         arm.setSmartCurrentLimit(ArmConstants.ARM_CURRENT_LIMIT_A);
     }
 
-    public void raiseArm(double trigger) {
-        arm.set(ArmConstants.ARM_OUTPUT_POWER * trigger);
+    public void raiseArm() {
+        arm.set(ArmConstants.ARM_OUTPUT_POWER );
     }
 
-    public void lowerArm(double trigger) {
-        arm.set(-ArmConstants.ARM_OUTPUT_POWER * trigger);
+    public void lowerArm() {
+        arm.set(-ArmConstants.ARM_OUTPUT_POWER);
+    }
+
+    public void noArmPower()
+    {
+        arm.set(0);
     }
     
 }

@@ -13,38 +13,36 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.Timer;
 import  com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings("PMD.ExcessiveImports")
+
 
 public class SwerveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId, 
-      DriveConstants.kFrontLeftTurningEncoderPort);
+      DriveConstants.kFrontLeftTurningCanId,
+      DriveConstants.kFrontLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightTurningEncoderPort);
+      DriveConstants.kFrontRightChassisAngularOffset);
 
   private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kRearLeftTurningEncoderPort);
+      DriveConstants.kBackLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kRearRightTurningEncoderPort);
-
-    private MAXSwerveModule[] modules = {m_frontLeft, m_frontRight, m_rearLeft, m_rearRight};
+      DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS();
@@ -57,7 +55,15 @@ public class SwerveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  SwerveDriveOdometry m_odometry;
+  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+      DriveConstants.kDriveKinematics,
+      Rotation2d.fromDegrees(m_gyro.getAngle()),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      });
   // Odometry class for tracking robot pose
 
   /** Creates a new DriveSubsystem. */
@@ -91,6 +97,8 @@ public class SwerveSubsystem extends SubsystemBase {
     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
 
+    SmartDashboard.putNumber("Gyro yaw", m_gyro.getYaw());
+
     SmartDashboard.putNumber("currentX", getPose().getX());
     SmartDashboard.putNumber("currentY", getPose().getY());
     SmartDashboard.putNumber("currentAngle", getPose().getRotation().getRadians());
@@ -122,8 +130,8 @@ public class SwerveSubsystem extends SubsystemBase {
         pose);
   }
 
-  /**
-   * Method to drive the robot using ` info.
+   /**
+   * Method to drive the robot using joystick info.
    *
    * @param xSpeed        Speed of the robot in the x direction (forward).
    * @param ySpeed        Speed of the robot in the y direction (sideways).
@@ -192,7 +200,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getHeading())
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);

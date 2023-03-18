@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +10,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+
 import frc.robot.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -22,9 +18,7 @@ public class MAXSwerveModule {
   private final CANSparkMax m_turningSparkMax;
 
   private final RelativeEncoder m_drivingEncoder;
-  private final RelativeEncoder m_turningEncoder;
-
-  private final DutyCycleEncoder throughBoreEncoder;
+  private final AbsoluteEncoder m_turningEncoder;
 
   private final SparkMaxPIDController m_drivingPIDController;
   private final SparkMaxPIDController m_turningPIDController;
@@ -38,7 +32,7 @@ public class MAXSwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, int absEncoderID) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
     m_drivingSparkMax = new CANSparkMax(drivingCANId, MotorType.kBrushless);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -49,7 +43,7 @@ public class MAXSwerveModule {
 
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     m_drivingEncoder = m_drivingSparkMax.getEncoder();
-    m_turningEncoder = m_turningSparkMax.getEncoder();
+    m_turningEncoder = m_turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
     m_drivingPIDController = m_drivingSparkMax.getPIDController();
     m_turningPIDController = m_turningSparkMax.getPIDController();
     m_drivingPIDController.setFeedbackDevice(m_drivingEncoder);
@@ -102,16 +96,12 @@ public class MAXSwerveModule {
     m_drivingSparkMax.setSmartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
 
-    throughBoreEncoder = new DutyCycleEncoder(absEncoderID);
-
-    syncEncoders();
-
     // Save the SPARK MAX configurations. If a SPARK MAX browns out during
     // operation, it will maintain the above configurations.
     m_drivingSparkMax.burnFlash();
     m_turningSparkMax.burnFlash();
 
-    //m_chassisAngularOffset = chassisAngularOffset;
+    m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
   }
@@ -166,9 +156,5 @@ public class MAXSwerveModule {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
-  }
-
-  public void syncEncoders() {
-    m_turningEncoder.setPosition(throughBoreEncoder.getAbsolutePosition() * Math.PI / 180);
   }
 }
