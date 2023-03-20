@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 //import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import  com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -46,6 +47,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS();
+  //TODO try get yaw instead of get angle
+  //TODO try Rotation2d.fromDegrees(navx.getFusedHeading());
+
 
   private double m_currentRotation = 0.0;
   private double m_currentTranslationDir = 0.0;
@@ -55,20 +59,17 @@ public class SwerveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
+  SwerveDriveOdometry m_odometry;
   // Odometry class for tracking robot pose
+
+  //TODO try fromDegrees(m_gyro.getAngle())
 
   /** Creates a new DriveSubsystem. */
   public SwerveSubsystem(){
+
+    m_gyro.calibrate();
     m_gyro.zeroYaw();
+
 
     m_odometry = new SwerveDriveOdometry(
     DriveConstants.kDriveKinematics, 
@@ -95,9 +96,13 @@ public class SwerveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
     
-    SmartDashboard.putNumber("Heading", getHeading().getDegrees());
+    SmartDashboard.putNumber("Heading using get rotation, calling getHeading()", getHeading().getDegrees());
 
     SmartDashboard.putNumber("Gyro yaw", m_gyro.getYaw());
+
+    SmartDashboard.putString("Raw 2d rotation", getHeading().toString());
+
+    SmartDashboard.putString("Get Angle", getAngle().toString());
 
     SmartDashboard.putNumber("currentX", getPose().getX());
     SmartDashboard.putNumber("currentY", getPose().getY());
@@ -254,6 +259,14 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Rotation2d getHeading() {
     return m_gyro.getRotation2d();
+  }
+
+  public Rotation2d getAngle() {
+    return Rotation2d.fromDegrees(m_gyro.getAngle());
+  }
+
+  public double getPitch() {
+    return m_gyro.getPitch();
   }
 
   /**

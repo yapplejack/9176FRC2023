@@ -7,10 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.cameraserver.CameraServer;
 //import com.revrobotics.CANSparkMax;
 //import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 //import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.auto.*;
@@ -94,6 +96,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     arm = new ArmSubsystem();
     intake = new IntakeSubsystem();
+    CameraServer.startAutomaticCapture();
     //arm.setInverted(true);
     //arm.setIdleMode(IdleMode.kBrake);
     //arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
@@ -130,14 +133,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
    // m_autonomousCommand = new TestConeAuto(arm, intake);
     //m_autonomousCommand = new TestCubeAuto(arm, intake);
-    m_autonomousCommand = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake);
+    //m_autonomousCommand = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake);
 
-    /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-     * = new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
-     */
+    
+      String autoSelected = SmartDashboard.getString("Auto Selector",
+      "Default"); switch(autoSelected) { case "My Auto": m_autonomousCommand
+      = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake); break; case "Default Auto": default:
+      m_autonomousCommand = new TestConeAuto(arm, intake); break; }
+     
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -169,6 +172,7 @@ public class Robot extends TimedRobot {
   static final int CUBE = 2;
   static final int NOTHING = 3;
   int lastGamePiece;
+  double armPower = 0;
 
 
   /** This function is called periodically during operator control. */
@@ -178,16 +182,20 @@ public class Robot extends TimedRobot {
     if (m_manipController.getLeftTriggerAxis() > .1) {
       // lower the arm
      // armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
-     arm.lowerArm();
+      arm.lowerArm();
+      armPower = -.55;
     } else if (m_manipController.getRightTriggerAxis() > .1) {
       // raise the arm
       //armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
       arm.raiseArm();
+      armPower = .55;
     } else {
       // do nothing and let it sit where it is
       //armPower = 0.0;
       arm.noArmPower();
+      armPower = 0;
     }
+    SmartDashboard.putNumber("Arm Power", armPower);
     //setArmMotor(armPower);
   
     double intakePower;
@@ -218,6 +226,7 @@ public class Robot extends TimedRobot {
       intakeAmps = 0;
     }
     intake.setIntakeMotor(intakePower, intakeAmps);
+    SmartDashboard.putNumber("Intake Power", intakePower);
   }
 
   @Override

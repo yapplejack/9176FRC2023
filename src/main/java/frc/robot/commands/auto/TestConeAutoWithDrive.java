@@ -36,56 +36,30 @@ public class TestConeAutoWithDrive extends SequentialCommandGroup{
     public TestConeAutoWithDrive(SwerveSubsystem swerve, ArmSubsystem m_arm, IntakeSubsystem m_intake) {
              addCommands(
                     new InstantCommand(() -> m_arm.raiseArm()),
-
-                new WaitCommand(1.7),
+                    new InstantCommand(() -> m_intake.pickupCone()),
+                
+                new WaitCommand(.4),
+                new InstantCommand(() -> m_intake.holdCone()),
+                new WaitCommand(1.3),
 
                     new InstantCommand(() -> m_arm.noArmPower()),
                     new InstantCommand(() -> m_intake.dropCone()),
 
-                new WaitCommand(.5),
+                new WaitCommand(.3),
 
                     new InstantCommand(() -> m_intake.stopIntake()),
+                    new InstantCommand(() -> m_arm.lowerArm()),
 
-                new WaitCommand(.4),
-
-                        new InstantCommand(() -> m_arm.lowerArm()),
-
-                new WaitCommand(2),
+                new WaitCommand(1.7),
 
                     new InstantCommand(() -> m_arm.noArmPower()),
 
-                new WaitCommand(1),
-
-                    new InstantCommand(() ->  {TrajectoryConfig config = new TrajectoryConfig(
-                        AutoConstants.kMaxSpeedMetersPerSecond,
-                        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                        // Add kinematics to ensure max speed is actually obeyed
-                        .setKinematics(DriveConstants.kDriveKinematics);
-                        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-                        // Start at the origin facing the +X direction
-                        new Pose2d(0, 0, new Rotation2d(0)),
-                        List.of(new Translation2d(-1, 0), new Translation2d(-2, 0)),
-                        // End 3 meters straight ahead of where we started, facing forward
-                        new Pose2d(-3, 0, new Rotation2d(0)),
-                        config);
-                        var thetaController = new ProfiledPIDController(
-                            AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-                        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-                        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-                            exampleTrajectory,
-                            swerve::getPose, // Functional interface to feed supplier
-                            DriveConstants.kDriveKinematics,
-
-                            new PIDController(AutoConstants.kPXController, 0, 0),
-                            new PIDController(AutoConstants.kPYController, 0, 0),
-                            thetaController,
-                            swerve::setModuleStates,
-                            swerve);
-
-                            swerve.resetOdometry(exampleTrajectory.getInitialPose());
-
-                            swerveControllerCommand.andThen(() -> swerve.drive(0, 0, 0, false, false));
+                    new InstantCommand(() ->  {
+                        swerve.drive(.5, 0, 0, true, true);
+                    }),
+                    new WaitCommand(1),
+                    new InstantCommand(() ->  {
+                        swerve.drive(0, 0, 0, true, true);
                     })
              );
 
