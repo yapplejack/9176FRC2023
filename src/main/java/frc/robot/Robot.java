@@ -139,7 +139,7 @@ public class Robot extends TimedRobot {
       String autoSelected = SmartDashboard.getString("Auto Selector",
       "Default"); switch(autoSelected) { case "My Auto": m_autonomousCommand
       = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake); break; case "Default Auto": default:
-      m_autonomousCommand = new TestConeAuto(arm, intake); break; }
+      m_autonomousCommand = new TestDriveAuto(m_robotContainer.m_robotDrive); break; }
      
 
     // schedule the autonomous command (example)

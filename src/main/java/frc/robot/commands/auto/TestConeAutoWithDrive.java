@@ -55,7 +55,7 @@ public class TestConeAutoWithDrive extends SequentialCommandGroup{
                     new InstantCommand(() -> m_arm.noArmPower()),
 
                     new InstantCommand(() ->  {
-                        swerve.drive(.5, 0, 0, true, true);
+                        swerve.drive(.5, 0, 0, false, true);
                     }),
                     new WaitCommand(1),
                     new InstantCommand(() ->  {
