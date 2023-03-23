@@ -64,18 +64,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 6;
     public static final int kRearRightTurningCanId = 8;
 
-    public static final int kFrontLeftTurningEncoderPort = 1;
-    public static final int kRearLeftTurningEncoderPort = 0;
-    public static final int kFrontRightTurningEncoderPort = 2;
-    public static final int kRearRightTurningEncoderPort = 3;
-
     public static final boolean kGyroReversed = true;
-
-    //TODO field relative
-
-    public static final boolean kFieldRelative = true;
-
-
   }
 
   public static final class ModuleConstants {
@@ -127,10 +116,6 @@ public final class Constants {
 
     public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
-    public static final int kNominalVoltage = 12;
-    public static final double kDriveGearRatio = 5.5;
-    public static final double kDriveConversionFactor = (kWheelDiameterMeters * Math.PI) / kDriveGearRatio;
-    public static final double kTurnPositionConversionFactor = 46.42;
   }
 
   public static final class ArmConstants {
@@ -148,7 +133,7 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kManipControllerPort = 1;
-    public static final double kDriveDeadband = 0.05;
+    public static final double kDriveDeadband = 0.08;
   }
 
   public static final class AutoConstants {

@@ -20,10 +20,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void pickupCone() {
+        intake.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_A);
         intake.set(IntakeConstants.INTAKE_OUTPUT_POWER);
     }
 
     public void dropCone() {
+        intake.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_A);
         intake.set(-IntakeConstants.INTAKE_OUTPUT_POWER);
     }
 

@@ -11,11 +11,10 @@ import edu.wpi.first.cameraserver.CameraServer;
 //import com.revrobotics.CANSparkMax;
 //import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 //import com.revrobotics.CANSparkMax.IdleMode;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.commands.auto.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.commands.autoCommandGroups.*;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -35,6 +34,8 @@ public class Robot extends TimedRobot {
   ArmSubsystem arm;
   //CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
   IntakeSubsystem intake;
+
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   static final int ARM_CURRENT_LIMIT_A = 20;
 
@@ -83,7 +84,22 @@ public class Robot extends TimedRobot {
    */
   static final double AUTO_DRIVE_SPEED = -0.25;
 
-  XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
+  //XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
+  //comment out the top two choices
+  private static final String kTestBal = "Test Balance with Intake";
+  private static final String kAutoBalance = "Raw Autobalance";
+
+  private static final String kConeDriveBack = "Cone drive";
+  private static final String kCubeDriveBack = "Cube drive";
+  
+  private static final String kConeAutoBalance = "Cone Autobalance";
+  private static final String kCubeAutoBalance = "Cube Autobalance";
+
+  private static final String kConeOnly = "Cone Only";
+  private static final String kCubeOnly = "Cube Only";
+  
+
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -103,6 +119,21 @@ public class Robot extends TimedRobot {
     //intake.setInverted(false);
     //intake.setIdleMode(IdleMode.kBrake);
 
+    //m_chooser.addOption("Test Balance", kTestBal);
+    //m_chooser.addOption("Raw Autobalance", kAutoBalance);
+
+    m_chooser.addOption(kConeDriveBack, kConeDriveBack);
+    m_chooser.addOption(kCubeDriveBack, kCubeDriveBack);
+
+    m_chooser.addOption(kConeAutoBalance, kConeAutoBalance);
+    m_chooser.addOption(kCubeAutoBalance, kCubeAutoBalance);
+    
+    m_chooser.addOption(kConeOnly, kConeOnly);
+    m_chooser.addOption(kCubeOnly, kCubeOnly);
+
+
+
+    SmartDashboard.putData("Auto choices", m_chooser);
   }
 
   /**
@@ -135,11 +166,35 @@ public class Robot extends TimedRobot {
     //m_autonomousCommand = new TestCubeAuto(arm, intake);
     //m_autonomousCommand = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake);
 
+    String autoSelected = m_chooser.getSelected();
+
+      switch(autoSelected) { case kTestBal : m_autonomousCommand 
+      = new TestBalanceWithIntake(intake, m_robotContainer.m_robotDrive); break;
+
+      case kAutoBalance: m_autonomousCommand =
+      new TestChargeAuto(m_robotContainer.m_robotDrive); break;
+
+      case kConeDriveBack :
+      m_autonomousCommand = new ConeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
     
-      String autoSelected = SmartDashboard.getString("Auto Selector",
-      "Default"); switch(autoSelected) { case "My Auto": m_autonomousCommand
-      = new TestConeAutoWithDrive(m_robotContainer.m_robotDrive, arm, intake); break; case "Default Auto": default:
-      m_autonomousCommand = new TestDriveAuto(m_robotContainer.m_robotDrive); break; }
+      case kCubeDriveBack : 
+      m_autonomousCommand = new CubeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
+
+      case kConeAutoBalance :
+      m_autonomousCommand = new BalanceWithCone(m_robotContainer.m_robotDrive, arm, intake); break;
+
+      case kCubeAutoBalance :
+      m_autonomousCommand = new BalanceWithCube(m_robotContainer.m_robotDrive, arm, intake); break;
+
+      case kConeOnly : default :
+      m_autonomousCommand = new SoloCone(arm, intake); break;
+
+      case kCubeOnly :
+      m_autonomousCommand = new SoloCube(arm, intake); break;
+    }
+
+      
+
      
 
     // schedule the autonomous command (example)
@@ -179,12 +234,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //double armPower; // 1 and 4 for buttons
-    if (m_manipController.getLeftTriggerAxis() > .1) {
+    if (m_robotContainer.m_manipController.getL2Axis() > .1) {
       // lower the arm
      // armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
       arm.lowerArm();
       armPower = -.55;
-    } else if (m_manipController.getRightTriggerAxis() > .1) {
+    } else if (m_robotContainer.m_manipController.getR2Axis() > .1) {
       // raise the arm
       //armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
       arm.raiseArm();
@@ -200,13 +255,13 @@ public class Robot extends TimedRobot {
   
     double intakePower;
     int intakeAmps;
-    if (m_manipController.getRawButton(5)) {
+    if (m_robotContainer.m_manipController.getRawButton(5)) {
       // cube in or cone out
       intakePower = INTAKE_OUTPUT_POWER;
       //intake.dropCone();
       intakeAmps = INTAKE_CURRENT_LIMIT_A;
       lastGamePiece = CUBE;
-    } else if (m_manipController.getRawButton(6)) {
+    } else if (m_robotContainer.m_manipController.getRawButton(6)) {
       // cone in or cube out
       intakePower = -INTAKE_OUTPUT_POWER;
       //intake.pickupCone();

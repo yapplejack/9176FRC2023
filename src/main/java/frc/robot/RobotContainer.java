@@ -13,19 +13,21 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
+//import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 //import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,14 +37,14 @@ import java.util.List;
  */
 public class RobotContainer {
   // The robot's subsystems
-  public final SwerveSubsystem m_robotDrive = new SwerveSubsystem();
+  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   //private final ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
 
-  XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
+  public final PS4Controller m_manipController = new PS4Controller(OIConstants.kManipControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -59,7 +61,7 @@ public class RobotContainer {
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(m_driverController.getRawAxis(2), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
   }
@@ -78,7 +80,7 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
-    new JoystickButton(m_driverController, 1).onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+    new JoystickButton(m_driverController, 2).onTrue(new InstantCommand(() -> m_robotDrive.zeroHaw()));
   }
 
   /**
