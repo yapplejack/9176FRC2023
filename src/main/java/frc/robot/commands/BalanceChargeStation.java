@@ -27,7 +27,7 @@ public class BalanceChargeStation extends CommandBase {
     //Speed should be slowed down
     @Override
     public void execute() {
-        m_swerve.drive(-.05, 0, 0, true, true);
+        m_swerve.drive(-.07, 0, 0, true, true);
     }
   
   
@@ -41,7 +41,7 @@ public class BalanceChargeStation extends CommandBase {
     // isFinished waits for the charge station to be balanced
     @Override
     public boolean isFinished() {
-        if(Math.abs(m_swerve.getPitch()) <= 4.0d){
+        if(Math.abs(m_swerve.getPitch()) <= 5.0d){
             return true;
           }
           return false;

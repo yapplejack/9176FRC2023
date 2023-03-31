@@ -2,8 +2,9 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import java.lang.Math;
+import edu.wpi.first.wpilibj.Timer;
 
-public class ApproachChargeStation extends CommandBase {
+public class DriveATadForward extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final DriveSubsystem m_swerve;
     private double m_startTime = 0;
@@ -13,7 +14,7 @@ public class ApproachChargeStation extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ApproachChargeStation(DriveSubsystem swerve) {
+    public DriveATadForward(DriveSubsystem swerve) {
         m_swerve = swerve;
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(swerve);
@@ -22,12 +23,17 @@ public class ApproachChargeStation extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+      m_startTime = Timer.getFPGATimestamp();
     }
+
+    public double getTime() {
+        return Timer.getFPGATimestamp() - m_startTime;
+      }
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_swerve.drive(-.14, 0, 0, true, true);
+        m_swerve.drive(.07, 0, 0, true, true);
     }
   
   
@@ -42,7 +48,7 @@ public class ApproachChargeStation extends CommandBase {
     public boolean isFinished() {
         //instead of end condition being time, end condition 
         //should be pitch > than a value
-        if(Math.abs(m_swerve.getPitch()) >= pitch){
+        if(getTime() >= .25f){
           return true;
         }
         return false;

@@ -8,12 +8,14 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.ApproachChargeStation;
 import frc.robot.commands.BalanceChargeStation;
 import frc.robot.commands.XonChargeStation;
+import frc.robot.commands.DriveATadForward;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class BalanceWithCube extends SequentialCommandGroup{
     ApproachChargeStation drive;
     BalanceChargeStation station_balance;
+    DriveATadForward back;
     XonChargeStation parkingBrake;
     public BalanceWithCube(DriveSubsystem swerve, ArmSubsystem m_arm, IntakeSubsystem m_intake) {
              addCommands(
@@ -37,6 +39,7 @@ public class BalanceWithCube extends SequentialCommandGroup{
                     new InstantCommand(() -> m_arm.noArmPower()),
                     drive = new ApproachChargeStation(swerve),
                     station_balance = new BalanceChargeStation(swerve),
+                    back = new DriveATadForward(swerve),
                     parkingBrake = new XonChargeStation(swerve));
 
     }
