@@ -114,13 +114,24 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 40; // amps
+    public static final int kDrivingMotorCurrentLimit = 50; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
   public static final class ArmConstants {
     public static final int ARM_CURRENT_LIMIT_A = 20;
-    public static final double ARM_OUTPUT_POWER = 0.55;
+    public static final double ARM_OUTPUT_POWER = 0.50;
+    public static final double kOffset = .118;
+    public static final double kMinHeightAbs = 0 + kOffset;
+    public static final double kMaxHeightAbs = .355 + kOffset;
+
+    public static final double kLVLONE = .1 + kOffset;
+    public static final double kLVLTWO = .2 + kOffset;
+    public static final double kLVLTRE = 0.367 + kOffset;
+
+    public static final double kArmMinOutput = -.1;
+    public static final double kArmMaxOutput = .1;
+    public static final double kAllowedErrAbs = .005;
   }
 
   public static final class IntakeConstants {

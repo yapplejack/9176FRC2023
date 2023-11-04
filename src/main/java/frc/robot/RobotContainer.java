@@ -13,7 +13,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.PS4Controller; 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -25,8 +27,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
-
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.NewArmSubsystem;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.armCommands.ArmToPosition;
+import frc.robot.commands.armCommands.LowerArm;
+import frc.robot.commands.armCommands.RaiseArm;
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -37,12 +43,14 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
+  private final NewArmSubsystem m_arm = new NewArmSubsystem();
+
   //private final ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
 
   // The driver's controller
-  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  public final PS4Controller m_manipController = new PS4Controller(OIConstants.kManipControllerPort);
+  public final CommandXboxController m_manipController = new CommandXboxController(OIConstants.kManipControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -50,6 +58,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    SmartDashboard.putNumber("Rot", m_driverController.getLeftX());
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -59,9 +69,9 @@ public class RobotContainer {
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                MathUtil.applyDeadband(m_driverController.getRawAxis(2) * -1, OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(m_driverController.getRightX() * -1, OIConstants.kDriveDeadband),
                 true, true),
-            m_robotDrive));
+            m_robotDrive)); 
   }
 
   /**
@@ -79,6 +89,13 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
     new JoystickButton(m_driverController, 2).onTrue(new InstantCommand(() -> m_robotDrive.zeroHaw()));
+    m_manipController.povDown().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.HOME));
+    m_manipController.povLeft().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLONE));
+    m_manipController.povUp().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLTWO));
+    m_manipController.povRight().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLTRE));
+    m_manipController.b().whileTrue(new RaiseArm(m_arm));
+    m_manipController.a().whileTrue(new LowerArm(m_arm));
+
   }
 
   /**

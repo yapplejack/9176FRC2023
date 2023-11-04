@@ -27,7 +27,7 @@ public class BalanceChargeStation extends CommandBase {
     //Speed should be slowed down
     @Override
     public void execute() {
-        m_swerve.drive(-.07, 0, 0, true, true);
+        m_swerve.drive(-.09, 0, 0, true, true);
     }
   
   

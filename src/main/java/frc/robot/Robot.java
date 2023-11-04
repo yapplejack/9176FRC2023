@@ -14,9 +14,14 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.commands.armCommands.ArmToPosition;
 import frc.robot.commands.autoCommandGroups.*;
-import frc.robot.subsystems.ArmSubsystem;
+//import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.NewArmSubsystem;
+import frc.robot.subsystems.NewArmSubsystem.armPositions;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.Constants;
+
 
 
 /**
@@ -31,7 +36,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   
   //CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
-  ArmSubsystem arm;
+  //NewArmSubsystem arm;
   //CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
   IntakeSubsystem intake;
 
@@ -42,7 +47,7 @@ public class Robot extends TimedRobot {
   /**
    * Percent output to run the arm up/down at
    */
-  static final double ARM_OUTPUT_POWER = 0.55;
+  static final double ARM_OUTPUT_POWER = 0.90;
 
   /**
    * How many amps the intake can use while picking up
@@ -110,7 +115,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    arm = new ArmSubsystem();
+    //arm = new NewArmSubsystem();
     intake = new IntakeSubsystem();
     CameraServer.startAutomaticCapture();
     //arm.setInverted(true);
@@ -175,22 +180,22 @@ public class Robot extends TimedRobot {
       new TestChargeAuto(m_robotContainer.m_robotDrive); break;
 
       case kConeDriveBack :
-      m_autonomousCommand = new ConeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
+      //m_autonomousCommand = new ConeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
     
       case kCubeDriveBack : 
-      m_autonomousCommand = new CubeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
+      //m_autonomousCommand = new CubeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
 
       case kConeAutoBalance :
-      m_autonomousCommand = new BalanceWithCone(m_robotContainer.m_robotDrive, arm, intake); break;
+      //m_autonomousCommand = new BalanceWithCone(m_robotContainer.m_robotDrive, arm, intake); break;
 
       case kCubeAutoBalance :
-      m_autonomousCommand = new BalanceWithCube(m_robotContainer.m_robotDrive, arm, intake); break;
+      //m_autonomousCommand = new BalanceWithCube(m_robotContainer.m_robotDrive, arm, intake); break;
 
       case kConeOnly : default :
-      m_autonomousCommand = new SoloCone(arm, intake); break;
+      //m_autonomousCommand = new SoloCone(arm, intake); break;
 
       case kCubeOnly :
-      m_autonomousCommand = new SoloCube(arm, intake); break;
+      //m_autonomousCommand = new SoloCube(arm, intake); break;
     }
 
       
@@ -234,28 +239,36 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //double armPower; // 1 and 4 for buttons
-    if (m_robotContainer.m_manipController.getL2Axis() > .1) {
+    /* 
+    if (m_robotContainer.m_manipController.getRawButton(1)) {
       // lower the arm
      // armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
-      arm.lowerArm();
-      armPower = -.55;
-    } else if (m_robotContainer.m_manipController.getR2Axis() > .1) {
+      new ArmToPosition(arm, armPositions.HOME);
+      //armPower = -.55;
+    } else if (m_robotContainer.m_manipController.getRawButton(2)) {
       // raise the arm
       //armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
-      arm.raiseArm();
-      armPower = .55;
-    } else {
+      new ArmToPosition(arm, armPositions.LVLTRE);
+      //arm.raiseArm();
+      //armPower = .55;
+    } else if (m_robotContainer.m_manipController.getRawButton(3)) {
+      new ArmToPosition(arm, armPositions.LVLONE);
+    } else if (m_robotContainer.m_manipController.getRawButton(4)) {
+      new ArmToPosition(arm, armPositions.LVLTWO);
+    }
+
+    else {
       // do nothing and let it sit where it is
       //armPower = 0.0;
       arm.noArmPower();
       armPower = 0;
-    }
+    }*/
     SmartDashboard.putNumber("Arm Power", armPower);
     //setArmMotor(armPower);
   
     double intakePower;
     int intakeAmps;
-    if (m_robotContainer.m_manipController.getRawButton(5)) {
+    /*if (m_robotContainer.m_manipController.getRawButton(5)) {
       // cube in or cone out
       intakePower = INTAKE_OUTPUT_POWER;
       //intake.dropCone();
@@ -279,9 +292,9 @@ public class Robot extends TimedRobot {
       intakePower = 0.0;
 
       intakeAmps = 0;
-    }
-    intake.setIntakeMotor(intakePower, intakeAmps);
-    SmartDashboard.putNumber("Intake Power", intakePower);
+    }*/
+    //intake.setIntakeMotor(intakePower, intakeAmps);
+    //SmartDashboard.putNumber("Intake Power", intakePower);
   }
 
   @Override

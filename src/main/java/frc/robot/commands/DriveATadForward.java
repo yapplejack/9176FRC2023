@@ -33,7 +33,7 @@ public class DriveATadForward extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_swerve.drive(.07, 0, 0, true, true);
+        m_swerve.drive(.10, 0, 0, true, true);
     }
   
   
@@ -48,7 +48,7 @@ public class DriveATadForward extends CommandBase {
     public boolean isFinished() {
         //instead of end condition being time, end condition 
         //should be pitch > than a value
-        if(getTime() >= .25f){
+        if(getTime() >= .65f){
           return true;
         }
         return false;
