@@ -1,10 +1,10 @@
-package frc.robot.commands.autoCommandGroups;
+package frc.robot.commands.autoCommandGroups.testAutos;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.commands.testCommands.TestIntakeApp;
+import frc.robot.commands.testCommands.TestIntakeBal;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.commands.TestIntakeApp;
-import frc.robot.commands.TestIntakeBal;
 
 public class TestBalanceWithIntake extends SequentialCommandGroup{
     TestIntakeApp drive;

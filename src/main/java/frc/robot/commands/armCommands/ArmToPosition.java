@@ -1,23 +1,23 @@
 package frc.robot.commands.armCommands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.NewArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
 public class ArmToPosition extends CommandBase {
-    private NewArmSubsystem m_arm;
-    private NewArmSubsystem.armPositions m_targetPos;
+    private ArmSubsystem m_arm;
+    private ArmSubsystem.armPositions m_targetPos;
     private boolean m_keepRunning;
     //private double m_startTime = 0;
 
-    public ArmToPosition(NewArmSubsystem arm, NewArmSubsystem.armPositions pos){
+    public ArmToPosition(ArmSubsystem arm, ArmSubsystem.armPositions pos){
         m_arm = arm;
         m_targetPos = pos;
         m_keepRunning = false;
         addRequirements(m_arm);
     }
 
-    public ArmToPosition(NewArmSubsystem arm, NewArmSubsystem.armPositions pos, boolean keepRunning){
+    public ArmToPosition(ArmSubsystem arm, ArmSubsystem.armPositions pos, boolean keepRunning){
         m_arm = arm;
         m_targetPos = pos;
         m_keepRunning = keepRunning;
@@ -40,11 +40,7 @@ public class ArmToPosition extends CommandBase {
 
     @Override
     public boolean isFinished(){
-        //if(getTime() >= 1.0f){
-        //    return true;
-        //  }
-        return m_arm.atPosition(m_targetPos);
-        //return false;
+        return false;
     }
 
     @Override

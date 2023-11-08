@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.commands.armCommands.ArmToPosition;
 import frc.robot.commands.autoCommandGroups.*;
+import frc.robot.commands.autoCommandGroups.testAutos.TestBalanceWithIntake;
+import frc.robot.commands.autoCommandGroups.testAutos.TestChargeAuto;
 //import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.NewArmSubsystem;
-import frc.robot.subsystems.NewArmSubsystem.armPositions;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem.armPositions;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants;
 
@@ -34,60 +36,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  
-  //CANSparkMax arm = new CANSparkMax(9, MotorType.kBrushless);
-  //NewArmSubsystem arm;
-  //CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
-  IntakeSubsystem intake;
 
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-  static final int ARM_CURRENT_LIMIT_A = 20;
-
-  /**
-   * Percent output to run the arm up/down at
-   */
-  static final double ARM_OUTPUT_POWER = 0.90;
-
-  /**
-   * How many amps the intake can use while picking up
-   */
-  static final int INTAKE_CURRENT_LIMIT_A = 25;
-
-  /**
-   * How many amps the intake can use while holding
-   */
-  static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
-
-  /**
-   * Percent output for intaking
-   */
-  static final double INTAKE_OUTPUT_POWER = 1.0;
-
-  /**
-   * Percent output for holding
-   */
-  static final double INTAKE_HOLD_POWER = 0.07;
-
-  /**
-   * Time to extend or retract arm in auto
-   */
-  static final double ARM_EXTEND_TIME_S = 2.0;
-
-  /**
-   * Time to throw game piece in auto
-   */
-  static final double AUTO_THROW_TIME_S = 0.375;
-
-  /**
-   * Time to drive back in auto
-   */
-  static final double AUTO_DRIVE_TIME = 6.0;
-
-  /**
-   * Speed to drive backwards in auto
-   */
-  static final double AUTO_DRIVE_SPEED = -0.25;
 
   //XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
   //comment out the top two choices
@@ -115,14 +65,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    //arm = new NewArmSubsystem();
-    intake = new IntakeSubsystem();
     CameraServer.startAutomaticCapture();
-    //arm.setInverted(true);
-    //arm.setIdleMode(IdleMode.kBrake);
-    //arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
-    //intake.setInverted(false);
-    //intake.setIdleMode(IdleMode.kBrake);
 
     //m_chooser.addOption("Test Balance", kTestBal);
     //m_chooser.addOption("Raw Autobalance", kAutoBalance);
@@ -174,33 +117,33 @@ public class Robot extends TimedRobot {
     String autoSelected = m_chooser.getSelected();
 
       switch(autoSelected) { case kTestBal : m_autonomousCommand 
-      = new TestBalanceWithIntake(intake, m_robotContainer.m_robotDrive); break;
+      = new TestBalanceWithIntake(m_robotContainer.m_intake, m_robotContainer.m_robotDrive); break;
 
       case kAutoBalance: m_autonomousCommand =
       new TestChargeAuto(m_robotContainer.m_robotDrive); break;
 
       case kConeDriveBack :
-      //m_autonomousCommand = new ConeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
+      m_autonomousCommand = 
+      new ConeLongDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_arm, m_robotContainer.m_intake); break;
     
       case kCubeDriveBack : 
-      //m_autonomousCommand = new CubeLongDrive(m_robotContainer.m_robotDrive, arm, intake); break;
+      m_autonomousCommand =
+      new CubeLongDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_arm, m_robotContainer.m_intake); break;
 
       case kConeAutoBalance :
-      //m_autonomousCommand = new BalanceWithCone(m_robotContainer.m_robotDrive, arm, intake); break;
+      m_autonomousCommand =
+      new BalanceWithCone(m_robotContainer.m_robotDrive, m_robotContainer.m_arm, m_robotContainer.m_intake); break;
 
       case kCubeAutoBalance :
-      //m_autonomousCommand = new BalanceWithCube(m_robotContainer.m_robotDrive, arm, intake); break;
+      m_autonomousCommand = 
+      new BalanceWithCube(m_robotContainer.m_robotDrive, m_robotContainer.m_arm, m_robotContainer.m_intake); break;
 
       case kConeOnly : default :
-      //m_autonomousCommand = new SoloCone(arm, intake); break;
+      m_autonomousCommand = new SoloCone(m_robotContainer.m_arm, m_robotContainer.m_intake); break;
 
       case kCubeOnly :
-      //m_autonomousCommand = new SoloCube(arm, intake); break;
+      m_autonomousCommand = new SoloCube(m_robotContainer.m_arm, m_robotContainer.m_intake); break;
     }
-
-      
-
-     
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -212,11 +155,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {}
 
-
-  public void setArmMotor(double percent) {
-    //arm.set(percent);
-  }
-
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running when
@@ -226,75 +164,12 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    lastGamePiece = NOTHING;
   }
-  static final int CONE = 1;
-  static final int CUBE = 2;
-  static final int NOTHING = 3;
-  int lastGamePiece;
-  double armPower = 0;
 
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //double armPower; // 1 and 4 for buttons
-    /* 
-    if (m_robotContainer.m_manipController.getRawButton(1)) {
-      // lower the arm
-     // armPower = -ARM_OUTPUT_POWER * m_manipController.getLeftTriggerAxis();
-      new ArmToPosition(arm, armPositions.HOME);
-      //armPower = -.55;
-    } else if (m_robotContainer.m_manipController.getRawButton(2)) {
-      // raise the arm
-      //armPower = ARM_OUTPUT_POWER * m_manipController.getRightTriggerAxis();
-      new ArmToPosition(arm, armPositions.LVLTRE);
-      //arm.raiseArm();
-      //armPower = .55;
-    } else if (m_robotContainer.m_manipController.getRawButton(3)) {
-      new ArmToPosition(arm, armPositions.LVLONE);
-    } else if (m_robotContainer.m_manipController.getRawButton(4)) {
-      new ArmToPosition(arm, armPositions.LVLTWO);
-    }
-
-    else {
-      // do nothing and let it sit where it is
-      //armPower = 0.0;
-      arm.noArmPower();
-      armPower = 0;
-    }*/
-    SmartDashboard.putNumber("Arm Power", armPower);
-    //setArmMotor(armPower);
-  
-    double intakePower;
-    int intakeAmps;
-    /*if (m_robotContainer.m_manipController.getRawButton(5)) {
-      // cube in or cone out
-      intakePower = INTAKE_OUTPUT_POWER;
-      //intake.dropCone();
-      intakeAmps = INTAKE_CURRENT_LIMIT_A;
-      lastGamePiece = CUBE;
-    } else if (m_robotContainer.m_manipController.getRawButton(6)) {
-      // cone in or cube out
-      intakePower = -INTAKE_OUTPUT_POWER;
-      //intake.pickupCone();
-      intakeAmps = INTAKE_CURRENT_LIMIT_A;
-      lastGamePiece = CONE;
-    } else if (lastGamePiece == CUBE) {
-      //intake.holdCube();
-      intakePower = INTAKE_HOLD_POWER;
-      intakeAmps = INTAKE_HOLD_CURRENT_LIMIT_A;
-    } else if (lastGamePiece == CONE) {
-      //intake.holdCone();
-      intakePower = -INTAKE_HOLD_POWER;
-      intakeAmps = INTAKE_HOLD_CURRENT_LIMIT_A;
-    } else {
-      intakePower = 0.0;
-
-      intakeAmps = 0;
-    }*/
-    //intake.setIntakeMotor(intakePower, intakeAmps);
-    //SmartDashboard.putNumber("Intake Power", intakePower);
   }
 
   @Override

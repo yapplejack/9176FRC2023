@@ -1,11 +1,13 @@
-package frc.robot.commands;
+package frc.robot.commands.testCommands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.testCommands.TestIntakeBal;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.Timer;
+
 import java.lang.Math;
 
-public class TestIntakeApp extends CommandBase {
+public class TestIntakeBal extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final IntakeSubsystem m_intake;
     private final DriveSubsystem m_swerve;
@@ -16,7 +18,7 @@ public class TestIntakeApp extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public TestIntakeApp(IntakeSubsystem intake, DriveSubsystem swerve) {
+    public TestIntakeBal(IntakeSubsystem intake, DriveSubsystem swerve) {
         m_intake = intake;
         m_swerve = swerve;
       // Use addRequirements() here to declare subsystem dependencies.
@@ -32,7 +34,8 @@ public class TestIntakeApp extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_intake.setIntakeMotor(.30, 5);
+        m_intake.setIntakeMotor(-.30, 5);
+
     }
   
     public double getTime() {
@@ -43,7 +46,7 @@ public class TestIntakeApp extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         //after we find the robot has been titled we will call another commandBase that drives until level
-        //TestIntakeBal station_balance = new TestIntakeBal(m_intake, m_swerve);
+        m_intake.setIntakeMotor(0, 25);
     }
   
     // Returns true when the command should end.
@@ -51,7 +54,7 @@ public class TestIntakeApp extends CommandBase {
     public boolean isFinished() {
         //instead of end condition being time, end condition 
         //should be pitch > than a value
-        if(Math.abs(m_swerve.getPitch()) >= 8.0d){
+        if(m_swerve.getPitch() <= Math.abs(4)){
           return true;
         }
         return false;

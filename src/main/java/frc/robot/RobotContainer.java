@@ -21,18 +21,21 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+
 import java.util.List;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.NewArmSubsystem;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.commands.armCommands.ArmToPosition;
 import frc.robot.commands.armCommands.LowerArm;
 import frc.robot.commands.armCommands.RaiseArm;
+import frc.robot.commands.intakeCommands.RunIntake;
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -43,14 +46,14 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  private final NewArmSubsystem m_arm = new NewArmSubsystem();
+  public final ArmSubsystem m_arm = new ArmSubsystem();
 
-  //private final ArmSubsystem m_ArmSubsystem = new ArmSubsystem();
+  public final IntakeSubsystem m_intake = new IntakeSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  public final CommandXboxController m_manipController = new CommandXboxController(OIConstants.kManipControllerPort);
+  public final XboxController m_manipController = new XboxController(OIConstants.kManipControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -84,18 +87,23 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
-    new JoystickButton(m_driverController, 2).onTrue(new InstantCommand(() -> m_robotDrive.zeroHaw()));
-    m_manipController.povDown().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.HOME));
-    m_manipController.povLeft().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLONE));
-    m_manipController.povUp().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLTWO));
-    m_manipController.povRight().onTrue(new ArmToPosition(m_arm, NewArmSubsystem.armPositions.LVLTRE));
-    m_manipController.b().whileTrue(new RaiseArm(m_arm));
-    m_manipController.a().whileTrue(new LowerArm(m_arm));
 
+    //setX
+    new JoystickButton(m_driverController, Button.kR1.value).whileTrue(new RunCommand(() -> m_robotDrive.setX(),m_robotDrive));
+    //Zero heading 
+    new JoystickButton(m_driverController, 2).onTrue(new InstantCommand(() -> m_robotDrive.zeroHaw()));
+
+    //hold to set arm to position
+    new POVButton(m_manipController, 180).whileTrue(new ArmToPosition(m_arm, ArmSubsystem.armPositions.HOME));
+    new POVButton(m_manipController, 270).whileTrue(new ArmToPosition(m_arm, ArmSubsystem.armPositions.LVLONE));
+    new POVButton(m_manipController, 0).whileTrue(new ArmToPosition(m_arm, ArmSubsystem.armPositions.LVLTWO));
+    new POVButton(m_manipController, 90).whileTrue(new ArmToPosition(m_arm, ArmSubsystem.armPositions.LVLTRE));
+    new JoystickButton(m_manipController, 1).whileTrue(new LowerArm(m_arm));
+    new JoystickButton(m_manipController, 2).whileTrue(new RaiseArm(m_arm));
+
+    //intake cone = 1, intake cube = 2 -> exjest cube = 1, exjest cone = 2 (lb intake cube, rb intake cone)
+    new JoystickButton(m_manipController, 6).whileTrue(new RunIntake(m_intake, 1));
+    new JoystickButton(m_manipController, 5).whileTrue(new RunIntake(m_intake, 2));
   }
 
   /**

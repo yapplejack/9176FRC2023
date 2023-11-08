@@ -129,8 +129,8 @@ public final class Constants {
     public static final double kLVLTWO = .2 + kOffset;
     public static final double kLVLTRE = 0.367 + kOffset;
 
-    public static final double kArmMinOutput = -.1;
-    public static final double kArmMaxOutput = .1;
+    public static final double kArmMinOutput = -.5;
+    public static final double kArmMaxOutput = .5;
     public static final double kAllowedErrAbs = .005;
   }
 
